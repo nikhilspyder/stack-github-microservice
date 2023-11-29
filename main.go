@@ -18,7 +18,7 @@ import (
 	"golang.org/x/oauth2"
 	"log"
 
-	secret-manager "cloud.google.com/go/secretmanager/apiv1"
+	secretmanager "cloud.google.com/go/secretmanager/apiv1"
             "cloud.google.com/go/secretmanager/apiv1/secretmanagerpb"
 )
 
@@ -261,42 +261,42 @@ func GetGitHubData(owner, repo string, accessToken string) ([]*GithubPost, error
 	return posts, nil
 }
 
-func getSecret() {
-        // GCP project in which to store secrets in Secret Manager.
-        projectID := "stack-github-assignment5"
-        secretVersionName := "projects/stack-github-assignment5/secrets/GITHUB_TOKEN/versions/latest"
-        version := &secret-manager.SecretVersionName{
-            Name: secretVersionName,
-        }
+func getSecret() string {
+    // GCP project in which to store secrets in Secret Manager.
+    projectID := "stack-github-assignment5"
+    secretVersionName := "projects/stack-github-assignment5/secrets/GITHUB_TOKEN/versions/latest"
+    version := &secretmanager.SecretVersionName{
+        Name: secretVersionName,
+    }
 
-        // Create the client.
-        ctx := context.Background()
-        client, err := secret-manager.NewClient(ctx)
-        if err != nil {
-                log.Fatal("failed to setup client: %v", err)
-        }
-        defer client.Close()
+    // Create the client.
+    ctx := context.Background()
+    client, err := secretmanager.NewClient(ctx)
+    if err != nil {
+        log.Fatal("failed to setup client: %v", err)
+    }
+    defer client.Close()
 
-        // Build the request.
-        accessRequest := &secret-manager.AccessSecretVersionRequest{
-            Name: version.Name,
-        }
+    // Build the request.
+    accessRequest := &secretmanager.AccessSecretVersionRequest{
+        Name: version.Name,
+    }
 
+    // Call the API.
+    result, err := client.AccessSecretVersion(ctx, accessRequest)
+    if err != nil {
+        log.Fatal("failed to access secret version: %v", err)
+    }
 
-        // Call the API.
-        result, err := client.AccessSecretVersion(ctx, accessRequest)
-        if err != nil {
-                log.Fatal("failed to access secret version: %v", err)
-        }
+    // Print the secret payload.
+    //
+    // WARNING: Do not print the secret in a production environment - this
+    // snippet is showing how to access the secret material.
+    log.Printf("Plaintext: %s", result.Payload.Data)
 
-        // Print the secret payload.
-        //
-        // WARNING: Do not print the secret in a production environment - this
-        // snippet is showing how to access the secret material.
-        log.Printf("Plaintext: %s", result.Payload.Data)
-
-        return result.Payload.Data
+    return result.Payload.Data
 }
+
 
 func main() {
 
