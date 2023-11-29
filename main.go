@@ -294,7 +294,7 @@ func main() {
 		fmt.Printf("StackOverflow posts for %s inserted into the StackoverflowDB successfully.\n", framework)
 
 		if len(repoInfo) == 2 {
-			gitHubData, err := GetGitHubData(repoInfo[0], repoInfo[1], "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") // Replace with actual token
+			gitHubData, err := GetGitHubData(repoInfo[0], repoInfo[1], "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") // Replace with actual token
 			if err != nil {
 				log.Fatalf("Error fetching data from GitHub for %s: %s\n", framework, err)
 			}
