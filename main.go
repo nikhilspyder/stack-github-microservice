@@ -280,6 +280,8 @@ func main() {
 		"Go":         {"golang", "go"},
 	}
 
+	githubToken := os.Getenv("GITHUB_TOKEN")
+
 	// Iterate over each framework/library
 	for framework, repoInfo := range frameworks {
 		// Fetch and insert StackOverflow data
@@ -294,7 +296,7 @@ func main() {
 		fmt.Printf("StackOverflow posts for %s inserted into the StackoverflowDB successfully.\n", framework)
 
 		if len(repoInfo) == 2 {
-			gitHubData, err := GetGitHubData(repoInfo[0], repoInfo[1], "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") // Replace with actual token
+			gitHubData, err := GetGitHubData(repoInfo[0], repoInfo[1], githubToken) // Replace with actual token
 			if err != nil {
 				log.Fatalf("Error fetching data from GitHub for %s: %s\n", framework, err)
 			}
