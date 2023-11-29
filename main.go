@@ -16,6 +16,10 @@ import (
 
 	"github.com/google/go-github/github"
 	"golang.org/x/oauth2"
+	"log"
+
+	secret-manager "cloud.google.com/go/secretmanager/apiv1"
+            "cloud.google.com/go/secretmanager/apiv1/secretmanagerpb"
 )
 
 // Define a struct to unmarshal the StackOverflow data
@@ -257,7 +261,47 @@ func GetGitHubData(owner, repo string, accessToken string) ([]*GithubPost, error
 	return posts, nil
 }
 
+func getSecret() {
+        // GCP project in which to store secrets in Secret Manager.
+        projectID := "stack-github-assignment5"
+        secretVersionName := "projects/stack-github-assignment5/secrets/GITHUB_TOKEN/versions/latest"
+        version := &secret-manager.SecretVersionName{
+            Name: secretVersionName,
+        }
+
+        // Create the client.
+        ctx := context.Background()
+        client, err := secret-manager.NewClient(ctx)
+        if err != nil {
+                log.Fatal("failed to setup client: %v", err)
+        }
+        defer client.Close()
+
+        // Build the request.
+        accessRequest := &secret-manager.AccessSecretVersionRequest{
+            Name: version.Name,
+        }
+
+
+        // Call the API.
+        result, err := client.AccessSecretVersion(ctx, accessRequest)
+        if err != nil {
+                log.Fatal("failed to access secret version: %v", err)
+        }
+
+        // Print the secret payload.
+        //
+        // WARNING: Do not print the secret in a production environment - this
+        // snippet is showing how to access the secret material.
+        log.Printf("Plaintext: %s", result.Payload.Data)
+
+        return result.Payload.Data
+}
+
 func main() {
+
+    githubToken = getSecret();
+
 	stackoverflowDB, err := getStackoverflowDBConnection()
 	if err != nil {
 		log.Fatalf("Error connecting to StackoverflowDB: %s\n", err)
@@ -279,8 +323,6 @@ func main() {
 		"Milvus":     {"milvus-io", "milvus"},
 		"Go":         {"golang", "go"},
 	}
-
-	githubToken := os.Getenv("GITHUB_TOKEN")
 
 	// Iterate over each framework/library
 	for framework, repoInfo := range frameworks {
