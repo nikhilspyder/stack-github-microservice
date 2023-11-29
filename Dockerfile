@@ -9,10 +9,5 @@ COPY go.mod ./
 COPY go.sum ./
 RUN go mod tidy
 COPY . ./
-
-# Install the necessary dependencies
-RUN go get cloud.google.com/go/secretmanager/apiv1
-RUN go get cloud.google.com/go/secretmanager/apiv1/secretmanagerpb
-
 RUN go build -o /main
 CMD [ "/main" ]
