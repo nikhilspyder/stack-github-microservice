@@ -18,8 +18,8 @@ import (
 	"golang.org/x/oauth2"
 	"log"
 
-	"cloud.google.com/go/secretmanager/apiv1"
-	"cloud.google.com/go/secretmanager/apiv1/secretmanagerpb"
+	secretmanager "cloud.google.com/go/secretmanager/apiv1"
+    "cloud.google.com/go/secretmanager/apiv1/secretmanagerpb"
 )
 
 // Define a struct to unmarshal the StackOverflow data
@@ -261,46 +261,66 @@ func GetGitHubData(owner, repo string, accessToken string) ([]*GithubPost, error
 	return posts, nil
 }
 
-func getSecret() string {
-    // GCP project in which to store secrets in Secret Manager.
-    projectID := "stack-github-assignment5"
-    secretVersionName := "projects/stack-github-assignment5/secrets/GITHUB_TOKEN/versions/latest"
-    version := &secretmanagerpb.SecretVersionName{
-        Name: secretVersionName,
-    }
+// [START secretmanager_get_secret_value]
+// Import statements...
 
-    // Create the client.
-    ctx := context.Background()
-    client, err := secretmanagerpb.NewClient(ctx)
-    if err != nil {
-        log.Fatal("failed to setup client: %v", err)
-    }
-    defer client.Close()
+// getSecretValue gets both metadata and the value of the given secret.
+func getSecretValue(w io.Writer, name string) error {
+	// Create the client.
+	ctx := context.Background()
+	client, err := secretmanager.NewClient(ctx)
+	if err != nil {
+		return fmt.Errorf("failed to create secretmanager client: %w", err)
+	}
+	defer client.Close()
 
-    // Build the request.
-    accessRequest := &secretmanagerpb.AccessSecretVersionRequest{
-        Name: version.Name,
-    }
+	// Build the request.
+	req := &secretmanagerpb.GetSecretRequest{
+		Name: name,
+	}
 
-    // Call the API.
-    result, err := client.AccessSecretVersion(ctx, accessRequest)
-    if err != nil {
-        log.Fatal("failed to access secret version: %v", err)
-    }
+	// Call the API to get metadata.
+	metaResult, err := client.GetSecret(ctx, req)
+	if err != nil {
+		return fmt.Errorf("failed to get secret metadata: %w", err)
+	}
 
-    // Print the secret payload.
-    //
-    // WARNING: Do not print the secret in a production environment - this
-    // snippet is showing how to access the secret material.
-    log.Printf("Plaintext: %s", result.Payload.Data)
+	replication := metaResult.Replication.Replication
+	fmt.Fprintf(w, "Found secret %s with replication policy %s\n", metaResult.Name, replication)
 
-    return result.Payload.Data
+	// Call the API to get the latest secret version.
+	accessReq := &secretmanagerpb.AccessSecretVersionRequest{
+		Name: fmt.Sprintf("%s/versions/latest", name),
+	}
+
+	// Get the secret payload.
+	accessResult, err := client.AccessSecretVersion(ctx, accessReq)
+	if err != nil {
+		return fmt.Errorf("failed to access secret version: %w", err)
+	}
+
+	// Print the secret value.
+	fmt.Fprintf(w, "Secret value: %s\n", string(accessResult.Payload.Data))
+
+	return string(accessResult.Payload.Data)
 }
+
+// [END secretmanager_get_secret_value]
+
 
 
 func main() {
 
-    githubToken = getSecret();
+//     githubToken = getSecret();
+
+    secretName := "projects/stack-github-assignment5/secrets/GITHUB_TOKEN"
+
+    	// Call the getSecretValue function.
+    githubToken, err := secretmanager.getSecretValue(os.Stdout, secretName)
+    if err != nil {
+        fmt.Printf("Error getting secret: %v\n", err)
+        os.Exit(1)
+    }
 
 	stackoverflowDB, err := getStackoverflowDBConnection()
 	if err != nil {
