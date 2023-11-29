@@ -18,8 +18,8 @@ import (
 	"golang.org/x/oauth2"
 	"log"
 
-	secretmanager "cloud.google.com/go/secretmanager/apiv1"
-            "cloud.google.com/go/secretmanager/apiv1/secretmanagerpb"
+	"cloud.google.com/go/secretmanager/apiv1"
+	"cloud.google.com/go/secretmanager/apiv1/secretmanagerpb"
 )
 
 // Define a struct to unmarshal the StackOverflow data
@@ -265,20 +265,20 @@ func getSecret() string {
     // GCP project in which to store secrets in Secret Manager.
     projectID := "stack-github-assignment5"
     secretVersionName := "projects/stack-github-assignment5/secrets/GITHUB_TOKEN/versions/latest"
-    version := &secretmanager.SecretVersionName{
+    version := &secretmanagerpb.SecretVersionName{
         Name: secretVersionName,
     }
 
     // Create the client.
     ctx := context.Background()
-    client, err := secretmanager.NewClient(ctx)
+    client, err := secretmanagerpb.NewClient(ctx)
     if err != nil {
         log.Fatal("failed to setup client: %v", err)
     }
     defer client.Close()
 
     // Build the request.
-    accessRequest := &secretmanager.AccessSecretVersionRequest{
+    accessRequest := &secretmanagerpb.AccessSecretVersionRequest{
         Name: version.Name,
     }
 
