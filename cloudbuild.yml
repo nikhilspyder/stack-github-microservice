@@ -5,7 +5,16 @@ steps:
   args:
     - '-c'
     - |
-      export GITHUB_TOKEN=$(gcloud secrets versions access latest --secret=GITHUB_TOKEN)
+      echo "export GITHUB_TOKEN=$(gcloud secrets versions access latest --secret=GITHUB_TOKEN)" >> /workspace/env_vars.sh
+  volumes:
+    - name: 'workspace'
+      path: /workspace
+
+  secretEnv:
+    - 'GITHUB_TOKEN'
+
+  substitutions:
+    _TOKEN_GITHUB: 'GITHUB_TOKEN'
 
 - name: "gcr.io/cloud-builders/docker"
   args: ['pull', 'dpage/pgadmin4']
@@ -30,8 +39,3 @@ steps:
 images:
 - gcr.io/stack-github-assignment5/go-microservice
 - gcr.io/stack-github-assignment5/pgadmin
-
-secrets:
-  - secretManager:
-      secretVersionName: projects/stack-github-assignment5/secrets/github-token/versions/LATEST
-      env: 'GITHUB_TOKEN'
