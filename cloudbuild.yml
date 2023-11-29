@@ -1,5 +1,12 @@
 steps:
 # Steps to pull a docker image for pgadmin, push it to container registry and deploy it to cloud run.
+- name: "gcr.io/cloud-builders/gcloud"
+  entrypoint: 'bash'
+  args:
+    - '-c'
+    - |
+      GITHUB_TOKEN=$(gcloud secrets versions access latest --secret=github-token)
+      export GITHUB_TOKEN
 - name: "gcr.io/cloud-builders/docker"
   args: ['pull', 'dpage/pgadmin4']
 - name: "gcr.io/cloud-builders/docker"
@@ -23,3 +30,8 @@ steps:
 images:
 - gcr.io/stack-github-assignment5/go-microservice
 - gcr.io/stack-github-assignment5/pgadmin
+
+secrets:
+  - secretManager:
+      secretVersionName: projects/stack-github-assignment5/secrets/github-token/versions/LATEST
+      env: 'GITHUB_TOKEN'
