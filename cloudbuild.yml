@@ -9,14 +9,6 @@ steps:
     - name: 'workspace'
       path: /workspace
 
-  images:
-    - gcr.io/stack-github-assignment5/go-microservice
-    - gcr.io/stack-github-assignment5/pgadmin
-
-  secretEnv:
-    - 'TOKEN_GITHUB'
-
-
 - name: "gcr.io/cloud-builders/docker"
   args: ['pull', 'dpage/pgadmin4']
 - name: "gcr.io/cloud-builders/docker"
@@ -40,3 +32,6 @@ steps:
 images:
 - gcr.io/stack-github-assignment5/go-microservice
 - gcr.io/stack-github-assignment5/pgadmin
+
+secretEnv:
+  - 'TOKEN_GITHUB'
