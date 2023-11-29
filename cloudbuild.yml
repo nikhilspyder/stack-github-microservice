@@ -6,15 +6,9 @@ steps:
     - '-c'
     - |
       echo "export GITHUB_TOKEN=$(gcloud secrets versions access latest --secret=GITHUB_TOKEN)" >> /workspace/env_vars.sh
-  volumes:
-    - name: 'workspace'
-      path: /workspace
 
   secretEnv:
     - 'GITHUB_TOKEN'
-
-  substitutions:
-    _TOKEN_GITHUB: 'GITHUB_TOKEN'
 
 - name: "gcr.io/cloud-builders/docker"
   args: ['pull', 'dpage/pgadmin4']
