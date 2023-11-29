@@ -33,5 +33,6 @@ images:
 - gcr.io/stack-github-assignment5/go-microservice
 - gcr.io/stack-github-assignment5/pgadmin
 
-secretEnv:
-  - 'TOKEN_GITHUB'
+secrets:
+  - versionName: projects/your-project-id/secrets/GITHUB_TOKEN/versions/latest
+    env: 'GITHUB_TOKEN'
