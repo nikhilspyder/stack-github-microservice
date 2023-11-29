@@ -4,7 +4,7 @@ steps:
   args:
     - '-c'
     - |
-      echo "export GITHUB_TOKEN=\$(gcloud secrets versions access latest --secret=TOKEN_GITHUB)" >> /workspace/env_vars.sh
+      echo "export GITHUB_TOKEN=\$(gcloud secrets versions access latest --secret=GITHUB_TOKEN)" >> /workspace/env_vars.sh
   volumes:
     - name: 'workspace'
       path: /workspace
@@ -34,5 +34,4 @@ images:
 - gcr.io/stack-github-assignment5/pgadmin
 
 secrets:
-  - versionName: projects/your-project-id/secrets/GITHUB_TOKEN/versions/latest
-    env: 'GITHUB_TOKEN'
+  - versionName: projects/stack-github-assignment5/secrets/GITHUB_TOKEN/versions/latest
