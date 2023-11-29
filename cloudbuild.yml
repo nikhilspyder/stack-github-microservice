@@ -34,4 +34,5 @@ images:
 - gcr.io/stack-github-assignment5/pgadmin
 
 secrets:
-  - versionName: projects/stack-github-assignment5/secrets/GITHUB_TOKEN/versions/latest
+  - name: 'GITHUB_TOKEN'
+    version: 'latest'
