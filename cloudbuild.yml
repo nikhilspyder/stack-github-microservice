@@ -5,8 +5,8 @@ steps:
   args:
     - '-c'
     - |
-      GITHUB_TOKEN=$(gcloud secrets versions access latest --secret=github-token)
-      export GITHUB_TOKEN
+      export GITHUB_TOKEN=$(gcloud secrets versions access latest --secret=GITHUB_TOKEN)
+
 - name: "gcr.io/cloud-builders/docker"
   args: ['pull', 'dpage/pgadmin4']
 - name: "gcr.io/cloud-builders/docker"
